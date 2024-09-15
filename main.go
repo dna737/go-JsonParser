@@ -54,7 +54,12 @@ func isInt(s string) bool {
     return true
 }
 
-func isValidEntity(entity string) bool {
+func isValidEntity(entity string, isKey bool) bool {
+	
+	if isKey {
+		return (string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\"")
+	}
+
 	return (string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\"" ||
 		entity == "true" || 
 		entity == "false" ||
@@ -94,10 +99,8 @@ func validateJson(text string) bool {
 
 		//Extracts kv from a pair and trims out the whitespace.
 		key, value := func() (string, string) { parts := strings.Split(pair, ":"); return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]) }()
-	
-		fmt.Println("key", key, "value", value)
-		if !isValidEntity(key) || !isValidEntity(value) {
-			fmt.Println("fail")
+		
+		if !isValidEntity(key, true) || !isValidEntity(value, false) {
 			return false
 		}
 	}

@@ -24,9 +24,9 @@ func TestInvalidJson(t *testing.T) {
 	`, 
 	`{
 		"key1": true,
-		"key2": False,
-		"key3": null,
-		"key4": "value",
+		"key2": false,
+		true: null,
+		null: "value",
 		"key5": 101
 	}`}	
 	
