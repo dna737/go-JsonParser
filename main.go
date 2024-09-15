@@ -55,20 +55,21 @@ func isInt(s string) bool {
 }
 
 func isValidEntity(entity string, isKey bool) bool {
-	
-	fmt.Println("entity:", entity)
+
+	firstChar, lastChar := string(entity[0]), string(entity[len(entity) - 1]) 
 	
 	if isKey {
-		return (string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\"")
+		return (firstChar == "\"" && lastChar == "\"")
 	}
 
-	return (string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\"" ||
+	return (
+		firstChar == "\"" && lastChar == "\"" ||
+		firstChar == "[" && lastChar == "]" ||
 		entity == "true" || 
 		entity == "false" ||
 		entity == "null" || 
 		isInt(entity) ||
 		validateJson(entity))
-		
 }
 
 func validateJson(text string) bool {
@@ -88,15 +89,14 @@ func validateJson(text string) bool {
 	if isEmptyJson(input, openIndex, closeIndex) {
 			return true
 	}
-
 	if strings.Count(input, ":") != strings.Count(input, ",") + 1 {
 		return false
 	}
 
 	inputExcludingBraces := input[openIndex + 1 : closeIndex]
+
 	//Extracting out the key and values for each pair:
 	for _, pair := range strings.Split(inputExcludingBraces, ",") {
-
 		if !strings.Contains(pair, ":") {
 			return false
 		}
@@ -104,9 +104,6 @@ func validateJson(text string) bool {
 		//Extracts kv from a pair and trims out the whitespace.
 		key, value := func() (string, string) { parts := strings.Split(pair, ":"); return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]) }()
 
-
-		fmt.Println(key, "value:", value)
-		
 		if !isValidEntity(key, true) || !isValidEntity(value, false) {
 			return false
 		}
@@ -119,5 +116,7 @@ func main() {
 	input := seekInput()
 	if validateJson(input) {
 		fmt.Println("The JSON is valid.")
+	} else {
+		fmt.Println("The JSON is invalid.")
 	}
 }
