@@ -45,8 +45,7 @@ func isEmptyJson(input string, openIndex, closeIndex int) bool {
 }
 
 func isValidEntity(entity string) bool {
-	// fmt.Println(len(entity) - 1)
-	return string(entity[0]) == "\"" //&& string(entity[len(entity) - 1 ]) == "\""
+	return string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\""
 }
 
 func validateJson(text string) bool {
@@ -63,22 +62,26 @@ func validateJson(text string) bool {
 		return false
 	}
 
-	//Extracting out the key and values:
-	openIndex, closeIndex, colonIndex := strings.Index(input, "{"), strings.Index(input, "}"), strings.Index(input, ":")
-
+	openIndex, closeIndex := strings.Index(input, "{"), strings.Index(input, "}")
 	if isEmptyJson(input, openIndex, closeIndex) {
-		return true
+			return true
 	}
 
-	fmt.Println(closeIndex, openIndex)
-	key, value := input[openIndex + 1 : colonIndex], input[colonIndex + 1 : closeIndex]
-	key = strings.TrimSpace(key)
-	value = strings.TrimSpace(value)
+	inputExcludingBraces := input[openIndex + 1 : closeIndex]
 
-	fmt.Println("key", key, "value", value)
-	if !isValidEntity(key) || !isValidEntity(value) {
-		fmt.Println("fail")
-		return false
+	//Extracting out the key and values for each pair:
+	for _, pair := range strings.Split(inputExcludingBraces, ",") {
+
+		fmt.Println(pair)
+
+		//Extracts kv from a pair and trims out the whitespace.
+		key, value := func() (string, string) { parts := strings.Split(pair, ":"); return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]) }()
+	
+		fmt.Println("key", key, "value", value)
+		if !isValidEntity(key) || !isValidEntity(value) {
+			fmt.Println("fail")
+			return false
+		}
 	}
 	
 	return true
