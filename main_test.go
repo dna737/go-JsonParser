@@ -6,7 +6,7 @@ import (
 )
 
 func TestValidJson(t *testing.T){
-	input :=  []string {`{"key": "value"}`, `{"key1": true, "key2": false, "key3": null}`}	
+	input :=  []string {`{"key": "value"}`, `{"key1": true, "key2": false, "key3": {}}`}	
 
 	for _, t := range input {
 		if !validateJson(t) {
