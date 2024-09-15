@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode"
 )
 
 func seekInput() string {
@@ -44,8 +45,21 @@ func isEmptyJson(input string, openIndex, closeIndex int) bool {
 	return  strings.TrimSpace(input[openIndex + 1 : closeIndex]) == ""
 }
 
+func isInt(s string) bool {
+    for _, c := range s {
+        if !unicode.IsDigit(c) {
+            return false
+        }
+    }
+    return true
+}
+
 func isValidEntity(entity string) bool {
-	return string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\""
+	return (string(entity[0]) == "\"" && string(entity[len(entity) - 1 ]) == "\"" ||
+		entity == "true" || 
+		entity == "false" ||
+		entity == "null" || 
+		isInt(entity))
 }
 
 func validateJson(text string) bool {
@@ -57,7 +71,6 @@ func validateJson(text string) bool {
 	if string(input[len(input) - 1]) == "\n" {
 		stringRange -= 1
 	}
-
 	if !checkEnds(input, stringRange) {
 		return false
 	}
@@ -67,12 +80,17 @@ func validateJson(text string) bool {
 			return true
 	}
 
-	inputExcludingBraces := input[openIndex + 1 : closeIndex]
+	if strings.Count(input, ":") != strings.Count(input, ",") + 1 {
+		return false
+	}
 
+	inputExcludingBraces := input[openIndex + 1 : closeIndex]
 	//Extracting out the key and values for each pair:
 	for _, pair := range strings.Split(inputExcludingBraces, ",") {
 
-		fmt.Println(pair)
+		if !strings.Contains(pair, ":") {
+			return false
+		}
 
 		//Extracts kv from a pair and trims out the whitespace.
 		key, value := func() (string, string) { parts := strings.Split(pair, ":"); return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]) }()
