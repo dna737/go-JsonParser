@@ -87,10 +87,10 @@ func validateJson(text string) bool {
 
 	openIndex, closeIndex := strings.Index(input, "{"), strings.LastIndex(input, "}")
 	if isEmptyJson(input, openIndex, closeIndex) {
-			return true
+		return true
 	}
-	if strings.Count(input, ":") != strings.Count(input, ",") + 1 {
-		return false
+	if string(input[closeIndex - 1]) == "," {
+		return false //Trailing commas are not allowed
 	}
 
 	inputExcludingBraces := input[openIndex + 1 : closeIndex]
@@ -102,9 +102,23 @@ func validateJson(text string) bool {
 		}
 
 		//Extracts kv from a pair and trims out the whitespace.
-		key, value := func() (string, string) { parts := strings.Split(pair, ":"); return strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1]) }()
+		key, value := func() (string, string) { 
 
+			k := strings.TrimSpace(strings.Split(pair, ":")[0])
+			
+			secondPart := strings.TrimSpace(strings.Split(pair, ":")[1])
+			v := secondPart
+			
+			if strings.Contains(pair, "{") {
+				v = pair[strings.Index(pair, "{"): strings.Index(pair, "}") + 1]
+			} 
+
+			return k, v
+			}()
+
+		fmt.Println("key:", key, "value:", value)
 		if !isValidEntity(key, true) || !isValidEntity(value, false) {
+			fmt.Println("test failed", key, value)
 			return false
 		}
 	}
@@ -120,3 +134,4 @@ func main() {
 		fmt.Println("The JSON is invalid.")
 	}
 }
+	
