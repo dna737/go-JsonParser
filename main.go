@@ -54,9 +54,43 @@ func isInt(s string) bool {
     return true
 }
 
+func isValidArray(entity, firstChar, lastChar string) bool {
+
+	minReq := firstChar == "[" && lastChar == "]" && strings.Count(entity, "'") == 0
+
+	if !minReq { return false }
+
+	for _, item := range strings.Split(entity, ",") {
+		trimmedItem := strings.TrimSpace(item)
+		first, last := getExtremeChars(trimmedItem)
+		
+		if isValidKeyword(trimmedItem) || isInt(trimmedItem){
+			continue
+		}
+		
+		if !(first == "\"" && last == "\"") {
+			return false
+		}
+	}
+
+	return true
+}
+
+func isValidKeyword(entity string) bool {
+
+	return entity == "true" || 
+		entity == "false" ||
+		entity == "null"
+}
+
+func getExtremeChars(entity string) (string, string) {
+
+	return string(entity[0]), string(entity[len(entity) - 1]) 
+}
+
 func isValidEntity(entity string, isKey bool) bool {
 
-	firstChar, lastChar := string(entity[0]), string(entity[len(entity) - 1]) 
+	firstChar, lastChar := getExtremeChars(entity)
 	
 	if isKey {
 		return (firstChar == "\"" && lastChar == "\"")
@@ -65,11 +99,29 @@ func isValidEntity(entity string, isKey bool) bool {
 	return (
 		firstChar == "\"" && lastChar == "\"" ||
 		firstChar == "[" && lastChar == "]" && strings.Count(entity, "'") == 0 ||
-		entity == "true" || 
-		entity == "false" ||
-		entity == "null" || 
+		isValidArray(entity, firstChar, lastChar) ||
+		isValidKeyword(entity) ||
 		isInt(entity) ||
 		validateJson(entity))
+}
+
+func getGroupedValue(value string) string {
+
+	items := []string{"{", "["}
+	closers := []string{"}", "]"}
+
+	for i, item := range items {
+
+		//TODO: There's an indexing error here. One of the strings is 0?
+
+		if strings.Contains(value, item) {
+			fmt.Println("len of string:", strings.Index(value, closers[i]) + 1)
+			v := value[strings.Index(value, item): strings.Index(value, closers[i]) + 1]
+			return v
+		} 
+	}
+
+	return value
 }
 
 func validateJson(text string) bool {
@@ -111,15 +163,15 @@ func validateJson(text string) bool {
 			
 			secondPart := strings.TrimSpace(strings.Split(pair, ":")[1])
 			v := secondPart
-			
-			if strings.Contains(pair, "{") {
-				v = pair[strings.Index(pair, "{"): strings.Index(pair, "}") + 1]
-			} 
+
+			v = getGroupedValue(secondPart)
+
+			// fmt.Println("v:", v)
 
 			return k, v
 			}()
 
-		fmt.Println("key:", key, "value:", value)
+		// fmt.Println("key:", key, "value:", value)
 		if !isValidEntity(key, true) || !isValidEntity(value, false) {
 			fmt.Println("test failed", key, value)
 			return false
