@@ -81,6 +81,9 @@ func validateJson(text string) bool {
 	if string(input[len(input) - 1]) == "\n" {
 		stringRange -= 1
 	}
+	if strings.Count(input, ":") > strings.Count(input, ",") + strings.Count(input, "{")  {
+		return false
+	}
 	if !checkEnds(input, stringRange) {
 		return false
 	}
