@@ -12,8 +12,23 @@ func TestValidJson(t *testing.T){
   "key-o": {
     "inner key": "inner value"
   },
-  "key-l": ['list value']
-}`}	
+  "key-l": ["list value"]
+}`,
+`
+{
+  "key": "value",
+  "key-n": 101,
+  "key-o": {},
+  "key-l": []
+}`,
+
+`{
+  "key": "value",
+  "key-n": 101,
+  "key-o": {},
+  "key-l": []
+}
+`,}	
 
 	for _, t := range input {
 		if !validateJson(t) {
@@ -35,6 +50,14 @@ func TestInvalidJson(t *testing.T) {
 		true: null,
 		null: "value",
 		"key5": 101
+	}`, 
+	`{
+  		"key": "value",
+  		"key-n": 101,
+  		"key-o": {
+  		  "inner key": "inner value"
+  		},
+  		"key-l": ['list value']
 	}`}	
 	
 	for _, t := range input {

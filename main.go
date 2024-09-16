@@ -64,7 +64,7 @@ func isValidEntity(entity string, isKey bool) bool {
 
 	return (
 		firstChar == "\"" && lastChar == "\"" ||
-		firstChar == "[" && lastChar == "]" ||
+		firstChar == "[" && lastChar == "]" && strings.Count(entity, "'") == 0 ||
 		entity == "true" || 
 		entity == "false" ||
 		entity == "null" || 
