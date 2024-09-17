@@ -27,7 +27,8 @@ func TestValidJson(t *testing.T){
   "key": "value",
   "key-n": 101,
   "key-o": {},
-  "key-l": [1, 2]
+  "key-p": 3,
+  "key-l": [12]
 }
 `,}	
 

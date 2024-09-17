@@ -164,9 +164,17 @@ func validateJson(text string) bool {
 			secondPart := strings.TrimSpace(strings.Split(pair, ":")[1])
 			v := secondPart
 
-			v = getGroupedValue(secondPart)
+			if strings.Contains(pair, "{") {
+				v = pair[strings.Index(pair, "{"): strings.Index(pair, "}") + 1]
+			} 
 
-			// fmt.Println("v:", v)
+
+			if strings.Contains(pair, "[") {
+				fmt.Println(pair)
+				v = pair[strings.Index(pair, "["): strings.Index(pair, "]") + 1]
+			} 
+
+			fmt.Println("v:", v)
 
 			return k, v
 			}()
